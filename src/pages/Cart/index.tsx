@@ -33,7 +33,7 @@ interface CoffeeInCart {
   image: string;
   quantity: number;
   subTotal: number;
-} 
+}
 
 const DELIVERY_PRICE = 3.75;
 
@@ -72,33 +72,53 @@ export function Cart() {
   ]);
 
   const amountTags: string[] = [];
-  
+
   /** Adicionando os tags dos cafés no array amountTags
-   * Se o tag já existir, não adiciona*/ 
+   * Se o tag já existir, não adiciona*/
   coffeesInCart.map(coffee => coffee.tags.map((tag) => {
     if (!amountTags.includes(tag)) {
       amountTags.push(tag);
     }
   }));
-  
+
   // valor total dos cafés no carrinho
   const totalItemsPrice = coffeesInCart.reduce((currencyValue, coffee) => {
     return currencyValue + coffee.price * coffee.quantity
   }, 0)
 
-  
+
   function handleItemIncrement(itemId: string) {
-    // coloque seu código aqui
+    setCoffeesInCart((prev) =>
+      prev.map((coffee) =>
+        coffee.id === itemId
+          ? {
+            ...coffee,
+            quantity: coffee.quantity + 1,
+            subTotal: (coffee.quantity + 1) * coffee.price,
+          }
+          : coffee
+      )
+    );
   }
 
   function handleItemDecrement(itemId: string) {
-    // coloque seu código aqui
+    setCoffeesInCart((prev) =>
+      prev.map((coffee) =>
+        coffee.id === itemId && coffee.quantity > 1
+          ? {
+            ...coffee,
+            quantity: coffee.quantity - 1,
+            subTotal: (coffee.quantity - 1) * coffee.price,
+          }
+          : coffee
+      )
+    );
   }
 
   function handleItemRemove(itemId: string) {
-    // coloque seu código aqui
+    setCoffeesInCart((prev) => prev.filter((coffee) => coffee.id !== itemId));
   }
-  
+
   return (
     <Container>
 
@@ -114,11 +134,11 @@ export function Cart() {
 
                   <div>
                     <span>{coffee.title}</span>
-                      <Tags>
-                        {coffee.tags.map((tag) => (
-                          <span key={tag}>{tag}</span>
-                        ))}
-                      </Tags>
+                    <Tags>
+                      {coffee.tags.map((tag) => (
+                        <span key={tag}>{tag}</span>
+                      ))}
+                    </Tags>
 
                     <CoffeeInfo>
                       <QuantityInput
